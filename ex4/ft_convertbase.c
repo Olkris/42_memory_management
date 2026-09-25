@@ -6,7 +6,7 @@
 /*   By: abalea <abalea@learner.42.tech>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/25 13:04:23 by abalea            #+#    #+#             */
-/*   Updated: 2026/09/25 14:38:42 by abalea           ###   ########.fr       */
+/*   Updated: 2026/09/25 14:46:09 by abalea           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,14 +46,14 @@ int	has_bad_characters(char *str)
 	return (1);
 }
 
-int	invalid_base(char *base)
+int	is_valid_base(char *base)
 {
 	if ((ft_strlen(base) < 2)
 		|| has_duplicates(base)
 		|| has_bad_characters(base))
-		return (1);
-	else
 		return (0);
+	else
+		return (1);
 }
 
 char	*ft_convert_base(char *nbr, char *base_from, char *base_to)
@@ -61,7 +61,7 @@ char	*ft_convert_base(char *nbr, char *base_from, char *base_to)
 	char	*output;
 	int		decimal_nbr;
 
-	if (invalid_base(base_from) || invalid_base(base_to))
+	if (!is_valid_base(base_from) || !is_valid_base(base_to))
 		return (NULL);
 	else
 	{
