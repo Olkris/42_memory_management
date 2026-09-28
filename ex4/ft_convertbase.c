@@ -6,69 +6,57 @@
 /*   By: abalea <abalea@learner.42.tech>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/25 13:04:23 by abalea            #+#    #+#             */
-/*   Updated: 2026/09/25 14:46:09 by abalea           ###   ########.fr       */
+/*   Updated: 2026/09/28 13:26:47 by abalea           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 
-int	ft_strlen(char *str)
+int	ft_strlen(char *str);
+
+int	is_valid_base(char *base);
+
+char	*base_to_base(char *str, char *base_from, char *base_to)
 {
-	char	*str_end;
+	int		ii;
+	int		decimal_nbr;
+	int		decimal_nbr_copy;
+	char	*output;
 
-	str_end = str;
-	while (*str_end != '\0')
-		str_end++;
-	return (str_end - str);
-}
-
-int	has_duplicates(char *str)
-{
-	int	i_str_a;
-	int	i_str_b;
-
-	while (str[i_str_a] != '\0')
+	decimal_nbr = 0;
+	while (*str)
 	{
-		i_str_b = i_str_a + 1;
-		while (str[i_str_b])
-		{
-			if (str[i_str_a] == str[i_str_b])
-				return (1);
-			i_str_b++;
-		}
-		i_str_a++;
+		while (*str && *str != base_from[ii])
+			ii++;
+		decimal_nbr += ii * ft_strlen(base_from);
+		str++;
 	}
-	return (0);
-}
-
-int	has_bad_characters(char *str)
-{
-	return (1);
-}
-
-int	is_valid_base(char *base)
-{
-	if ((ft_strlen(base) < 2)
-		|| has_duplicates(base)
-		|| has_bad_characters(base))
-		return (0);
-	else
-		return (1);
+	decimal_nbr_copy = decimal_nbr;
+	ii = 0;
+	while (decimal_nbr_copy > 0)
+	{
+		decimal_nbr_copy /= ft_strlen(base_to);
+		ii++;
+	}
+	output = malloc(sizeof(char) * ii + sizeof('\0'));
+	output[ii] = '\0';
+	while (decimal_nbr > 0 && ii > 0)
+	{
+		output[ii] = decimal_nbr % 10;
+		ii--;
+		decimal_nbr /= 10;
+	}
+	return (output);
 }
 
 char	*ft_convert_base(char *nbr, char *base_from, char *base_to)
 {
 	char	*output;
-	int		decimal_nbr;
 
 	if (!is_valid_base(base_from) || !is_valid_base(base_to))
 		return (NULL);
 	else
-	{
-		output = malloc(sizeof(char) * 1 + sizeof('\0') * 1);
-		output[0] = 'H';
-		output[1] = '\0';
-	}
+		output = base_to_base(nbr, base_from, base_to);
 	return (output);
 }
 
@@ -122,7 +110,8 @@ int	main(int argc, char *argv[])
 	// IF ENDLESS ARRAYS
 	size_argv_dynamic_array = argc - skip_func_name - skip_pre_array_arguments;
 	// POTENTIAL PRINT OF ENDLESS ARRAY SIZE
-	// HERE
+	if (0)
+		printf("Array size: %d\n", size_argv_dynamic_array);
 
 	i_argv = 0 + skip_func_name;
 	while (i_argv < argc)
