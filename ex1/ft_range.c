@@ -6,7 +6,7 @@
 /*   By: abalea <abalea@learner.42.tech>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/23 16:41:58 by abalea            #+#    #+#             */
-/*   Updated: 2026/09/28 12:08:08 by abalea           ###   ########.fr       */
+/*   Updated: 2026/09/29 18:54:43 by abalea           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,16 @@ int	*ft_range(int min, int max)
 {
 	int	i;
 	int	*result;
-	int	distance;
 
 	if (min >= max)
 		return (NULL);
-	distance = max - min;
-	result = malloc(sizeof(int) * distance);
+	result = malloc(sizeof(int) * (max - min));
 	if (!result)
 		return (NULL);
 	i = 0;
-	while (i < distance)
+	while (min < max)
 	{
-		result[i] = min + i;
-		i++;
+		result[i++] = min++;
 	}
 	return (result);
 }
@@ -46,6 +43,7 @@ int	main(int argc, char *argv[])
 		"1", "9", "8",
 		"20", "24", "4",
 		"2", "1", "err",
+		"1", "1", "err",
 		"test", "hi", "err"};
 	int		skip_func_name = 1;
 	int		*output;

@@ -6,7 +6,7 @@
 /*   By: abalea <abalea@learner.42.tech>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/23 16:49:01 by abalea            #+#    #+#             */
-/*   Updated: 2026/09/28 12:08:15 by abalea           ###   ########.fr       */
+/*   Updated: 2026/09/29 18:58:14 by abalea           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,25 +16,22 @@ int	ft_ultimate_range(int **range, int min, int max)
 {
 	int	i;
 	int	*result;
-	int	distance;
 
 	if (min >= max)
 	{
 		*range = NULL;
 		return (0);
 	}
-	distance = max - min;
-	result = malloc(sizeof(int) * distance);
+	result = malloc(sizeof(int) * (max - min));
 	if (!result)
 		return (-1);
 	i = 0;
-	while (i < distance)
+	while (min < max)
 	{
-		result[i] = min + i;
-		i++;
+		result[i++] = min++;
 	}
 	*range = result;
-	return (distance);
+	return (max - min);
 }
 
 /*
@@ -50,6 +47,7 @@ int	main(int argc, char *argv[])
 		"1", "9", "8",
 		"20", "24", "4",
 		"2", "1", "err",
+		"1", "1", "err",
 		"test", "hi", "err"};
 	int		skip_func_name = 1;
 	int		*output;
