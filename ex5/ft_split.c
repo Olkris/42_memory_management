@@ -6,12 +6,22 @@
 /*   By: abalea <abalea@learner.42.tech>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/28 18:28:26 by abalea            #+#    #+#             */
-/*   Updated: 2026/09/28 21:40:07 by abalea           ###   ########.fr       */
+/*   Updated: 2026/09/29 15:59:27 by abalea           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 // #include <stdio.h>
+
+int	ft_strlen(char *str)
+{
+	char	*str_end;
+
+	str_end = str;
+	while (*str_end != '\0')
+		str_end++;
+	return (str_end - str);
+}
 
 int	is_in_charset(char str, char *charset)
 {
@@ -43,12 +53,47 @@ int	count_words(char *str, char *charset)
 	return (count);
 }
 
+char	*grab_word(char *str_start, char *str_end)
+{
+	char	*word;
+	int		i_word;
+
+	word = malloc(sizeof(char) * (str_end - str_start) + sizeof('\0'));
+	word[str_end - str_start] = '\0';
+	i_word = 0;
+	while (*str_start && str_start < str_end)
+	{
+		word[i_word] = *str_start;
+		str_start++;
+		i_word++;
+	}
+	return (word);
+}
+
 char	**ft_split(char *str, char *charset)
 {
 	char	**output;
+	int		i_output;
+	char	*word;
+	char	*str_offset;
 
 	output = malloc(sizeof(char *) * count_words(str, charset) + sizeof('\0'));
 	output[count_words(str, charset)] = NULL;
+	i_output = 0;
+	while (*str)
+	{
+		while (is_in_charset(*str, charset))
+			str++;
+		if (!is_in_charset(*str, charset))
+		{
+			str_offset = str;
+			while (*str_offset && !is_in_charset(*str_offset, charset))
+				str_offset++;
+			word = grab_word(str, str_offset);
+			output[i_output++] = word;
+			str = str_offset;
+		}
+	}
 	return (output);
 }
 
@@ -64,12 +109,19 @@ void	fail(int error_number)
 
 void	unit_tests()
 {
-	if (is_in_charset(',', "-+ ,") != 1)
+	if (
+		(ft_strlen("123456") != 6)
+		&& (ft_strlen("") != 0)
+	)
 		fail(1);
+	if (
+		(is_in_charset(',', "-+ ,") != 1)
+	)
+		fail(2);
 	if (
 		(count_words("Hello,HI,HEY", ",") != 3)
 	)
-		fail(2);
+		fail(3);
 }
 
 void	print_array(char *array[], char *wrap, char *separator)
@@ -133,7 +185,7 @@ int	main(int argc, char *argv[])
 		printf("Array size: %d\n", size_argv_dynamic_array);
 	}
 	i_argv = 0 + SKIP_PROGRAM_NAME;
-	while (i_argv < argc)
+	while (i_argv < argc && argv[i_argv] != NULL)
 	{
 		printf("\033[1;34mInput[%d]:\033[0m\n", i_argv);
 		// POTENTIALLY IN A WHILE LOOP TO GRAB ENDLESS ARRAY
