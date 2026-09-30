@@ -6,11 +6,12 @@
 /*   By: abalea <abalea@learner.42.tech>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/24 15:40:10 by abalea            #+#    #+#             */
-/*   Updated: 2026/09/28 12:08:29 by abalea           ###   ########.fr       */
+/*   Updated: 2026/09/30 19:19:03 by abalea           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
+// #include <stdio.h>
 
 int	ft_strlen(char *str)
 {
@@ -101,11 +102,18 @@ char	*ft_strjoin(int size, char **strs, char *sep)
 }
 
 /*
-// #include <stdio.h>
 // #include <malloc.h>
 // #include <string.h>
 
-int	unit_tests()
+#define SKIP_PROGRAM_NAME 1
+
+void	fail(int error_number)
+{
+	printf("\033[1;31m[Unit test number %d failed]\033[0m\n", error_number);
+	exit(error_number);
+}
+
+void	unit_tests()
 {
 	char	*array[] = {"Hey", "hi", "Hello"};
 	char	*output = "Hi-----Hey";
@@ -118,13 +126,13 @@ int	unit_tests()
 	if (ft_strlen("Hello") != 5)
 	{
 		printf("%d\n", ft_strlen("Hello"));
-		return (1);
+		fail(1);
 	}
 	
 	if (combined_length(3, array, ", ") != 14)
 	{
 		printf("%d\n", combined_length(3, array, ", "));
-		return (2);
+		fail(2);
 	}
 
 	i_output = 0;
@@ -139,80 +147,187 @@ int	unit_tests()
 	if (strcmp(output, expected_output) != 0 || i_output != 8)
 	{
 		printf("Text: %s\nPosition after: %d\n", output, i_output);
-		return(3);
+		fail(3);
 	}
 	free(output);
 
 	output = malloc(sizeof(char) * (3 + 5 + 2 + ((int) '\0') + 1));
 	if (!output)
-		return (-1);
+		fail(-1);
 	real_strjoin(3, array, ", ", output);
 	if (strcmp(output, "Hey, hi, Hello") != 0)
 	{
 		printf("%s\n", output);
-		return(4);
+		fail(4);
 	}
+}
 
-	return (0);
+void	print_words(char *words[], char *wrap, char *separator)
+{
+	int	i_words;
+
+	i_words = 0;
+	while (words[i_words] != NULL)
+	{
+		printf("%c%s%c", wrap[0], words[i_words], wrap[1]);
+		if (words[i_words+1] != NULL)
+			printf("%s", separator);
+		i_words++;
+	}
+}
+
+void	print_numbers(
+	int *numbers, int count_numbers, char *wrap, char *separator
+)
+{
+	int	i_numbers;
+
+	i_numbers = 0;
+	while (i_numbers < count_numbers)
+	{
+		printf("%c%d%c", wrap[0], numbers[i_numbers], wrap[1]);
+		if (numbers[i_numbers+1] != count_numbers)
+			printf("%s", separator);
+		i_numbers++;
+	}
+}
+
+void print_usage(char *program_name, char *arg_names[], char *mode)
+{
+	printf("\033[1;33mUsage instructions:\033[0m\n");
+	printf("    %s [", program_name);
+	print_words(arg_names, "<>", " ");
+	if (strcmp(mode, "finite_sets") == 0)
+		printf("]...");
+	else if (strcmp(mode, "dynamic_array") == 0)
+		printf("...]");
+	else
+		printf("]");
+	printf("\n\n");
+}
+
+void	parse_argv_null(char *argv[], int i_argv, int count_arg_names)
+{
+	int	i_argv_offset;
+
+	i_argv_offset = 0;
+	while (i_argv_offset < count_arg_names)
+	{
+		if (strcmp(argv[i_argv + i_argv_offset], "NULL") == 0)
+			argv[i_argv + i_argv_offset] = NULL;
+		i_argv_offset++;
+	}
+}
+
+char	**build_dynamic_array(
+	char *argv[], int skip_pre_array_args, int size_dynamic_array
+)
+{
+	int		i_argv = 0 + SKIP_PROGRAM_NAME + skip_pre_array_args;
+	char	**output;
+	int		i_output;
+
+	output = malloc(sizeof(char *) * size_dynamic_array + sizeof(NULL));
+	if (!output)
+		return (NULL);
+	i_output = 0;
+	while (argv[i_argv + i_output])
+	{
+		output[i_output] = argv[i_argv + i_output];
+		i_output++;
+	}
+	output[i_output] = NULL;
+	return (output); 
 }
 
 int	main(int argc, char *argv[])
 {
+	char	mode[] = "dynamic_array";
+	char	*arg_names[] = {
+		"Separator", "Words",
+		NULL};
+	int		i_arg_names;
+	int		count_arg_names = 0;
+	char	*fallback_argv[] = {argv[0], ", ",
+		"Hello", "Hi", "foo", "bar",
+		NULL};
 	int		i_argv;
+	int		skip_pre_array_args = 0;
+	char	**dynamic_array;
+	int		size_dynamic_array = 0;
 	char	*output;
-	char	*fallback_argv[] = {argv[0], ", ", "Hello", "Hi", "foo"};
-	int		skip_func_name = 1;
-	int		skip_separator = 1;
-	int		count_argv_words;
-	char	**array1;
-	int		error_code;
+	//int		size_output;
+	//int		return_capture;
 
-
-	error_code = unit_tests();
-	if (error_code != 0)
-	{
-		printf("\033[1;31m[Unit test number %d failed]\033[0m\n", error_code);
-		return (error_code);
-	}
-
-	printf("\033[1;33mUsage instructions:\033[0m\n");
-	printf("    a.out [<separator> <words>...]\n\n");
+	unit_tests();
+	printf("\033[1;32m[All unit tests passed]\033[0m\n\n");
+	print_usage(argv[0], arg_names, mode);
 	if (argc == 1)
 	{
-		argc = sizeof(fallback_argv) / sizeof(char *);
 		argv = fallback_argv;
+		argc = 0;
+		while (argv[argc])
+			argc++;
 	}
-
-	count_argv_words = argc - skip_func_name - skip_separator;
-	printf("\033[1;34mCount of items: %d\033[0m\n\n", count_argv_words);
-	array1 = malloc(sizeof(char *) * argc - skip_func_name - 2);
-	if (!array1)
-		return (-1);
-
-	i_argv = 0 + skip_func_name;
+	//// DEBUG
+	//printf("argc: %d | sizeof(fallback_argv): %d\n",
+	//	argc, (int)(sizeof(fallback_argv) / sizeof(char *)));
+	while (arg_names[count_arg_names])
+		count_arg_names++;
+	//// DEBUG
+	//printf("count_arg_names: %d | sizeof: %d\n",
+	//	 count_arg_names, (int)(sizeof(arg_names) / sizeof(char *)));
+	i_argv = 0 + SKIP_PROGRAM_NAME;
 	while (i_argv < argc)
 	{
 		printf("\033[1;34mInput[%d]:\033[0m\n", i_argv);
-		printf("Size: %d | Separator: \"%s\"\n", count_argv_words, argv[i_argv]);
-		i_argv += 1;
-		printf("Array: ");
-		while (i_argv < argc)
+		parse_argv_null(argv, i_argv, count_arg_names);
+		// POTENTIALLY IN A WHILE LOOP TO GRAB DYNAMIC ARRAY
+		i_arg_names = 0;
+		while (
+			i_arg_names < count_arg_names - (strcmp(mode, "dynamic_array") == 0)
+		)
 		{
-			array1[i_argv - skip_func_name - skip_separator] = argv[i_argv];
-			printf("[%s]", argv[i_argv]);
-			if (i_argv != argc - 1)
-				printf(", ");
-			i_argv++;
+			printf("%s: \"%s\"",
+				arg_names[i_arg_names], argv[i_argv + i_arg_names]);
+			if (
+				i_arg_names + 1 
+				!= count_arg_names - (strcmp(mode, "dynamic_array") == 0)
+			)
+				printf(" | ");
+			i_arg_names++;
 		}
+		printf("\n");
+		if (strcmp(mode, "dynamic_array") == 0)
+		{
+			skip_pre_array_args = count_arg_names - 1;
+			size_dynamic_array = argc - SKIP_PROGRAM_NAME - skip_pre_array_args;
+			dynamic_array = build_dynamic_array(
+				argv, skip_pre_array_args, size_dynamic_array
+			);
+			printf("Array: ");
+			print_words(dynamic_array, "[]", ", ");
+			printf("\n");
+			printf("Array size: %d\n", size_dynamic_array);
+		}
+		output = ft_strjoin(
+			size_dynamic_array, dynamic_array, argv[i_argv]
+		);
+		printf("\033[1;32m--- Result ---\033[0m\n");
+		//// ARRAY OUTPUT MODE
+		//size_output = atoi(argv[i_argv+1]) - atoi(argv[i_argv]);
+		//printf("Return value: %d\n", return_capture);
+		//printf("Array: ");
+		//print_numbers(output, size_output, "", " ");
+		////
+		//// SINGLE OUTPUT MODE
+		printf("Output: \"%s\"", output);
 		printf("\n\n");
-
-		i_argv += 0; // FOR REPEATING LOOPS
+		free(output);
+		if (strcmp(mode, "finite_sets") == 0)
+			i_argv += count_arg_names;
+		else if (strcmp(mode, "dynamic_array") == 0)
+			i_argv += skip_pre_array_args + size_dynamic_array;
 	}
-	// OUT OF THE LOOP FOR THIS ONE BECAUSE SINGLE RUN FUNCTION
-	i_argv = 0 + skip_func_name;
-	output = ft_strjoin(count_argv_words, array1, argv[i_argv]);
-	printf("\033[1;32m--- Result ---\033[0m\nValue: %s\n\n", output);
-	free(output);
-	
 }
 */
